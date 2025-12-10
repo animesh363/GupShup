@@ -2,7 +2,9 @@ var express = require('express');
 var app = express();
 var Server = require('socket.io');
 
-var server = app.listen(3000, () => {
+const PORT = process.env.PORT || 3000;
+
+var server = app.listen(PORT, () => {
     console.log("Server is running on port 3000");
 });
 
@@ -31,3 +33,5 @@ io.on('connection', (socket) => {
         console.log("User disconnected: " + socket.id);
     });
 });
+
+module.exports = app;
