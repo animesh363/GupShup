@@ -3,7 +3,7 @@
     "builds": [
         {
             "src": "socket.js",
-            "use": "@varcel/node"
+            "use": "@vercel/node"
         }
     ],
     "routes": [
