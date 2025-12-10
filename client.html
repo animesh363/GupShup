@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GapShup 💬</title>
+    <script src="socket.io/socket.io.js"></script>
+    
+    <style>
+        body {
+            font-family: Arial;
+            background: linear-gradient(160deg, #0a0502 5%, #2c1206 35%, #ff6a00 120%);
+;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+
+        }
+        .container {
+            width: 330px;
+            background: #fdfbd8;
+            border-radius: 10px;
+            box-shadow: 0 5px 10px rgba(0,0,0,0.2);
+            padding: 10px;
+            box-shadow: 0 0 10px #ff7a00,
+                        0 0 25px #cb730d,
+                        0 0 45px #ff8800;
+
+        }
+        h2 {
+            text-align: center;
+            background: rgb(254, 94, 35);
+            color: white;
+            padding: 10px;
+            border-radius: 10px;
+            margin: 0 0 10px 0;
+        }
+        #chat-box {
+            height: 300px;
+            overflow-y: auto;
+            background: #ffffff;
+            border: 1px solid #ddd;
+            padding: 10px;
+            border-radius: 5px;
+        }
+
+        .msg {
+            padding: 8px 10px;
+            margin: 5px 0;
+            border-radius: 6px;
+            font-size: 14px;
+            word-wrap: break-word;
+        }
+
+        .me {
+            background: #d1f7c4;
+            text-align: right;
+        }
+        .other {
+            background: white;
+            border: 1px solid #ccc;
+            text-align: left;
+        }
+
+        input, button {
+            width: 100%;
+            margin-top: 5px;
+            padding: 8px;
+            box-sizing: border-box;
+        }
+
+        button {
+            background: #2c912c;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        button:hover {
+            background: #2c912c;
+        }
+
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>GapShup 💬</h2>
+    
+    <div id="chat-box"></div>
+
+    <input type="text" id="uname" placeholder="Enter your name"><br>
+    <input type="text" id="umessage" placeholder="Type message"><br>
+    <button onclick="sendMsg()">Send ➤</button>
+</div>
+
+<script>
+    var socket = io();
+    var username = document.getElementById("uname");
+    var message = document.getElementById("umessage");
+    var chat = document.getElementById("chat-box");
+
+    function sendMsg(){
+        if(username.value.trim() === "") {
+            alert("Please enter your name!");
+            return;
+        }
+        if(message.value.trim() === "") {
+            alert("Please enter a message!");
+            return;
+        }
+
+        let msgData = {
+            name: username.value,
+            msg: message.value
+        };
+
+        showMessage(msgData.name, msgData.msg, true);
+
+        socket.emit("chatMessage", msgData);
+        
+        message.value = "";
+    }
+
+    socket.on("chatMessage", (data)=>{
+        if(data.name !== username.value) {
+            showMessage(data.name, data.msg, false);
+        }
+    });
+
+    function showMessage(name, msg, isSender){
+        let div = document.createElement("div");
+        div.className = "msg " + (isSender ? "me" : "other");
+        div.innerHTML = isSender ? 
+            `✔ <strong>You:</strong> ${msg}` :
+            `👤 <strong>${name}:</strong> ${msg}`;
+
+        chat.appendChild(div);
+        chat.scrollTop = chat.scrollHeight;
+    }
+
+    // Allow Enter key to send
+    document.getElementById("umessage").addEventListener("keypress", function(e) {
+        if(e.key === "Enter") sendMsg();
+    });
+</script>
+
+</body>
+</html>
